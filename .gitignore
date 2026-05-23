@@ -1,0 +1,18 @@
+﻿# Dependencias
+node_modules/
+
+# Variables de entorno
+.env
+backend/.env
+
+# Build 
+dist/
+frontend/dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# SO
+.DS_Store
+Thumbs.db
