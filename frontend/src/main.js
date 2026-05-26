@@ -1,5 +1,8 @@
 import { createApp } from 'vue';
 import App from './App.vue';
+import router from './router'; // Importamos la configuración del router
 
-// Crea la instancia de Vue y la inyecta en el div#app del index.html
-createApp(App).mount('#app');
+const app = createApp(App);
+
+app.use(router); // Inyectamos el router en la instancia
+app.mount('#app');

@@ -1,51 +1,35 @@
 <template>
-  <div style="font-family: Arial, sans-serif; padding: 20px; text-align: center;">
-    <h1>🛒 Ecommerce Tech 2026</h1>
-    <h3 style="color: #42b883;">Entorno de Vue.js y Vite inicializado con éxito</h3>
-    
-    <div style="margin: 30px auto; max-width: 500px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; text-align: left; background-color: #f9f9f9;">
-      <h4 style="margin-top: 0; color: #333;">📡 Prueba de Conexión Backend</h4>
-      
-      <p v-if="cargando" style="color: #666;">Intentando conectar con Node.js...</p>
-      
-      <div v-else-if="error" style="color: #d9534f; font-weight: bold;">
-        {{ error }}
-      </div>
-      
-      <div v-else style="color: #5cb85c;">
-        <p><strong>Estado:</strong> {{ datosBackend.estado }}</p>
-        <p><strong>Mensaje:</strong> {{ datosBackend.mensaje }}</p>
-        <p style="font-size: 0.8em; color: #888;"><strong>Timestamp:</strong> {{ datosBackend.timestamp }}</p>
-      </div>
-    </div>
+  <div class="app-wrapper">
+    <header class="navbar">
+      <div class="logo">💻 Tech2026</div>
+      <nav class="nav-links">
+        <router-link to="/">Inicio</router-link>
+        <router-link to="/catalogo">Catálogo</router-link>
+        <router-link to="/carrito">Carrito</router-link>
+      </nav>
+    </header>
+
+    <main class="main-content">
+      <router-view></router-view>
+    </main>
+
+    <footer class="footer">
+      <p>© 2026 Ecommerce Tech - Proyecto Fase 1</p>
+    </footer>
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue';
-import api from './services/api'; // Importamos la instancia configurada
+<style>
+/* Estilos Globales del Layout */
+body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; color: #333; }
+.app-wrapper { display: flex; flex-direction: column; min-height: 100vh; }
 
-// Variables reactivas para manejar el estado de la interfaz
-const datosBackend = ref(null);
-const error = ref(null);
-const cargando = ref(true);
+.navbar { background-color: #212529; color: white; display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.logo { font-size: 1.5rem; font-weight: bold; }
+.nav-links a { color: #adb5bd; text-decoration: none; margin-left: 20px; font-weight: 500; transition: color 0.3s; }
+.nav-links a:hover, .nav-links a.router-link-active { color: white; }
 
-// Función asíncrona para consultar el servidor
-const verificarConexion = async () => {
-  try {
-    // Al usar api.js, la ruta completa se traduce a http://localhost:3000/api/health
-    const respuesta = await api.get('/health');
-    datosBackend.value = respuesta.data;
-  } catch (err) {
-    console.error('Fallo en la petición HTTP:', err);
-    error.value = 'Conexión rechazada. Asegúrate de que el servidor Node.js esté encendido.';
-  } finally {
-    cargando.value = false;
-  }
-};
+.main-content { flex: 1; padding: 20px; }
 
-// Se ejecuta automáticamente cuando el componente se monta en el navegador
-onMounted(() => {
-  verificarConexion();
-});
-</script>
+.footer { background-color: #e9ecef; text-align: center; padding: 15px; font-size: 0.9rem; color: #6c757d; border-top: 1px solid #dee2e6; }
+</style>
