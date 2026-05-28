@@ -6,7 +6,7 @@
     </header>
     
     <div class="product-grid">
-      <div class="product-card" v-for="p in productosSimulados" :key="p.id_producto">
+      <div class="product-card" v-for="p in productosSimulados" :key="p.id_producto" @click="verDetalle(p.id_producto)" style="cursor: pointer;">
         <div class="product-visual">
           <div class="badge" v-if="p.stock > 10">Popular</div>
           <img :src="p.imagen" :alt="p.nombre">
@@ -17,7 +17,7 @@
           <h3>{{ p.nombre }}</h3>
           <div class="footer-card">
             <span class="price">Q {{ p.precio.toLocaleString('es-GT', {minimumFractionDigits: 2}) }}</span>
-            <button class="add-btn" :disabled="p.stock === 0">
+            <button class="add-btn" :disabled="p.stock === 0" @click.stop="agregarAlCarrito(p)">
               <span v-if="p.stock > 0">Añadir</span>
               <span v-else>Agotado</span>
             </button>
@@ -30,6 +30,10 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+// Inicialización del router
+const router = useRouter();
 
 const productosSimulados = ref([
   { id_producto: 1, nombre: 'Intel Core i9-14900K Processor', precio: 5200.00, stock: 12, imagen: 'http://googleusercontent.com/image_collection/image_retrieval/4211281548323305122' },
@@ -37,6 +41,16 @@ const productosSimulados = ref([
   { id_producto: 3, nombre: 'ASUS ROG Maximus Z790 Hero', precio: 6100.00, stock: 8, imagen: 'http://googleusercontent.com/image_collection/image_retrieval/13207192106555462465' },
   { id_producto: 4, nombre: 'Samsung 990 Pro 2TB NVMe SSD', precio: 1650.00, stock: 25, imagen: 'http://googleusercontent.com/image_collection/image_retrieval/1053402543148818950' }
 ]);
+
+// Función de navegación
+const verDetalle = (id) => {
+  router.push(`/producto/${id}`);
+};
+
+// Función de simulación para el botón (preparada para cuando se integre estado global)
+const agregarAlCarrito = (producto) => {
+  console.log(`Producto ${producto.id_producto} preparado para el carrito.`);
+};
 </script>
 
 <style scoped>
