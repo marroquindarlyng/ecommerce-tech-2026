@@ -1,0 +1,74 @@
+[
+  {
+    "id": 101,
+    "codigo_barras": "7501234567890",
+    "nombre": "Laptop ASUS Vivobook 15",
+    "descripcion": "Laptop de 15.6 pulgadas, procesador Intel Core i5, 16GB RAM, 512GB SSD.",
+    "categoria": "Electrónica",
+    "img": "laptop_asus_vivobook_15.jpg",
+    "precio_compra": 450,
+    "precio_venta": 649.99,
+    "moneda": "USD",
+    "stock": {
+      "actual": 25,
+      "minimo_requerido": 5,
+      "maximo_permitido": 30
+    },
+    "proveedor": {
+      "id_proveedor": 12,
+      "nombre_empresa": "Distribuidora Tech S.A.",
+      "contacto": "proveedores@techsa.com"
+    },
+    "ubicacion_almacen": "Pasillo A - Estante 4",
+    "fecha_ingreso": "2026-03-15T14:30:00Z",
+    "activo": true
+  },
+  {
+    "id": 102,
+    "codigo_barras": "7509876543210",
+    "nombre": "Mouse Inalámbrico Logitech M280",
+    "descripcion": "Mouse óptico ergonómico con conexión USB de 2.4GHz, color negro.",
+    "categoria": "Accesorios",
+    "img": "mouse_logitech_m280.jpg",
+    "precio_compra": 10.5,
+    "precio_venta": 19.99,
+    "moneda": "USD",
+    "stock": {
+      "actual": 4,
+      "minimo_requerido": 10,
+      "maximo_permitido": 50
+    },
+    "proveedor": {
+      "id_proveedor": 15,
+      "nombre_empresa": "Accesorios Globales",
+      "contacto": "ventas@accglobales.com"
+    },
+    "ubicacion_almacen": "Pasillo B - Cajón 2",
+    "fecha_ingreso": "2026-04-01T09:15:00Z",
+    "activo": true
+  },
+  {
+    "id": 103,
+    "codigo_barras": "7504567890123",
+    "nombre": "Teclado Mecánico Redragon Mitra",
+    "descripcion": "Teclado mecánico para juegos, switches azules, retroiluminación RGB, distribución en español.",
+    "categoria": "Accesorios",
+    "img": "teclado_redragon_mitra.jpg",
+    "precio_compra": 25,
+    "precio_venta": 45,
+    "moneda": "USD",
+    "stock": {
+      "actual": 0,
+      "minimo_requerido": 8,
+      "maximo_permitido": 25
+    },
+    "proveedor": {
+      "id_proveedor": 12,
+      "nombre_empresa": "Distribuidora Tech S.A.",
+      "contacto": "proveedores@techsa.com"
+    },
+    "ubicacion_almacen": "Pasillo B - Estante 1",
+    "fecha_ingreso": "2026-02-10T11:00:00Z",
+    "activo": false
+  }
+]

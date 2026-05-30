@@ -1,0 +1,83 @@
+[
+  {
+    "id_venta": 5001,
+    "encabezado": {
+      "folio_factura": "FAC-2026-001",
+      "fecha_venta": "2026-05-26T18:45:00Z",
+      "metodo_pago": "Tarjeta de Crédito",
+      "estado_pago": "Completado",
+      "cliente": {
+        "id_cliente": 882,
+        "nombre_completo": "Carlos Mendoza Gómez",
+        "rfc_nit": "MEGC9011277H4",
+        "correo": "carlos.mendoza@email.com",
+        "telefono": "+52 55 1234 5678",
+        "direccion_envio": {
+          "calle": "Av. Reforma 405",
+          "ciudad": "Ciudad de México",
+          "codigo_postal": "06000",
+          "pais": "México"
+        }
+      }
+    },
+    "detalle_productos": [
+      {
+        "id_producto": 101,
+        "nombre_producto": "Laptop ASUS Vivobook 15",
+        "cantidad": 1,
+        "precio_unitario": 649.99,
+        "descuento_aplicado": 50.00,
+        "subtotal": 599.99
+      },
+      {
+        "id_producto": 102,
+        "nombre_producto": "Mouse Inalámbrico Logitech M280",
+        "cantidad": 2,
+        "precio_unitario": 19.99,
+        "descuento_aplicado": 0.00,
+        "subtotal": 39.98
+      }
+    ],
+    "totales": {
+      "subtotal_general": 689.97,
+      "descuento_total": 50.00,
+      "impuestos_iva": 102.40,
+      "gran_total": 742.37,
+      "moneda": "USD"
+    }
+  },
+  {
+    "id_venta": 5002,
+    "encabezado": {
+      "folio_factura": "FAC-2026-002",
+      "fecha_venta": "2026-05-26T20:15:00Z",
+      "metodo_pago": "Efectivo",
+      "estado_pago": "Completado",
+      "cliente": {
+        "id_cliente": 941,
+        "nombre_completo": "Ana María Silva",
+        "rfc_nit": "PÚBLICO EN GENERAL",
+        "correo": "ana.silva@email.com",
+        "telefono": "+52 55 8765 4321",
+        "direccion_envio": null
+      }
+    },
+    "detalle_productos": [
+      {
+        "id_producto": 102,
+        "nombre_producto": "Mouse Inalámbrico Logitech M280",
+        "cantidad": 1,
+        "precio_unitario": 19.99,
+        "descuento_aplicado": 0.00,
+        "subtotal": 19.99
+      }
+    ],
+    "totales": {
+      "subtotal_general": 19.99,
+      "descuento_total": 0.00,
+      "impuestos_iva": 3.20,
+      "gran_total": 23.19,
+      "moneda": "USD"
+    }
+  }
+]
