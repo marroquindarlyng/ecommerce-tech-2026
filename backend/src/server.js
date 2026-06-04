@@ -11,6 +11,21 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+// ---- REGISTRO DE RUTAS CON REGLAS CRÍTICAS ----
+const productoRouter = require('./producto');
+const carritoRouter = require('./carrito');
+const carritoDetalleRouter = require('./carrito-detalle');
+const clienteRouter = require('./cliente');
+const categoriaRouter = require('./categoria');
+
+app.use(categoriaRouter);       // Endpoints GET /api/categoria y GET /api/categoria/:id
+
+app.use(clienteRouter);         // Endpoints GET /api/cliente y GET /api/cliente/:id
+
+app.use(productoRouter);        // Endpoints POST /api/producto
+app.use(carritoRouter);         // Endpoints POST /api/carrito/crear
+app.use(carritoDetalleRouter);  // Endpoints POST /api/carrito-detalle/agregar
+
 // Ruta de diagnóstico
 app.get('/api/health', (req, res) => {
     res.status(200).json({
