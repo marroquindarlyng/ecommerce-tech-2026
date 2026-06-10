@@ -18,7 +18,7 @@ router.get('/api/cliente', async (req, res, next) => {
                 NOMBRE_COMPRETO AS "nombre_completo",
                 CORREO AS "correo",
                 DIRECCION_ENVIO AS "direccion_envio"
-            FROM CLIENTE
+            FROM ADMIN.CLIENTE
             ORDER BY NOMBRE_COMPRETO ASC
         `);
 
@@ -50,7 +50,7 @@ router.get('/api/cliente/:id', async (req, res, next) => {
                 NOMBRE_COMPRETO AS "nombre_completo",
                 CORREO AS "correo",
                 DIRECCION_ENVIO AS "direccion_envio"
-            FROM CLIENTE
+            FROM ADMIN.CLIENTE
             WHERE ID_CLIENTE = :idCliente
         `, { idCliente });
 

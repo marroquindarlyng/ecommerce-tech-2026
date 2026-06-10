@@ -44,7 +44,7 @@ app.get('/api/categorias', async (req, res, next) => {
             SELECT
                 id_categoria AS "id_categoria",
                 nombre AS "nombre"
-            FROM categoria
+            FROM ADMIN.CATEGORIA
             ORDER BY nombre
         `);
 
@@ -74,8 +74,8 @@ app.get('/api/productos', async (req, res, next) => {
                 p.ficha_tecnica AS "ficha_tecnica",
                 p.url_galeria AS "imagen",
                 c.nombre AS "categoria"
-            FROM producto p
-            LEFT JOIN categoria c ON c.id_categoria = p.id_categoria
+            FROM ADMIN.PRODUCTO p
+            LEFT JOIN ADMIN.CATEGORIA c ON c.id_categoria = p.id_categoria
             ORDER BY p.nombre
         `);
 
@@ -113,8 +113,8 @@ app.get('/api/productos/:id', async (req, res, next) => {
                 p.ficha_tecnica AS "ficha_tecnica",
                 p.url_galeria AS "imagen",
                 c.nombre AS "categoria"
-            FROM producto p
-            LEFT JOIN categoria c ON c.id_categoria = p.id_categoria
+            FROM ADMIN.PRODUCTO p
+            LEFT JOIN ADMIN.CATEGORIA c ON c.id_categoria = p.id_categoria
             WHERE p.id_producto = :idProducto
         `, { idProducto });
 

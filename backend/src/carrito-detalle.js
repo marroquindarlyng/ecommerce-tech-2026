@@ -26,8 +26,8 @@ router.get('/api/carrito-detalle/orden/:id_orden', async (req, res, next) => {
                 d.CANTIDAD AS "cantidad",
                 d.PRECIO_UNITARIO AS "precio_unitario",
                 d.SUBTOTAL AS "subtotal"
-            FROM DETALLE_ORDEN d
-            LEFT JOIN PRODUCTO p ON d.ID_PRODUCTO = p.ID_PRODUCTO
+            FROM ADMIN.DETALLE_ORDEN d
+            LEFT JOIN ADMIN.PRODUCTO p ON d.ID_PRODUCTO = p.ID_PRODUCTO
             WHERE d.ID_ORDEN = :idOrden
             ORDER BY d.ID_DETALLE ASC
         `, { idOrden });
@@ -74,7 +74,7 @@ router.post('/api/carrito-detalle/agregar', async (req, res, next) => {
             // Bloqueamos la fila del producto temporalmente para mitigar la compra simultánea del mismo artículo
             const checkStockSql = `
                 SELECT STOCK_ACTUAL, NOMBRE 
-                FROM PRODUCTO 
+                FROM ADMIN.PRODUCTO 
                 WHERE ID_PRODUCTO = :id_producto 
                 FOR UPDATE
             `;
@@ -131,7 +131,7 @@ router.post('/api/carrito-detalle/agregar', async (req, res, next) => {
 
             // ACCIÓN B: Devaluación física del stock en la tabla PRODUCTO (Regla 6 y 17)
             const descStockSql = `
-                UPDATE PRODUCTO 
+                UPDATE ADMIN.PRODUCTO 
                 SET STOCK_ACTUAL = STOCK_ACTUAL - :cantidad 
                 WHERE ID_PRODUCTO = :id_producto
             `;

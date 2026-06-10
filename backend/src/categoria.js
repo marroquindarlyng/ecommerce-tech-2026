@@ -16,7 +16,7 @@ router.get('/api/categoria', async (req, res, next) => {
             SELECT 
                 ID_CATEGORIA AS "id_categoria",
                 NOMBRE AS "nombre"
-            FROM CATEGORIA
+            FROM ADMIN.CATEGORIA
             ORDER BY NOMBRE ASC
         `);
 
@@ -45,7 +45,7 @@ router.get('/api/categoria/:id', async (req, res, next) => {
             SELECT 
                 ID_CATEGORIA AS "id_categoria",
                 NOMBRE AS "nombre"
-            FROM CATEGORIA
+            FROM ADMIN.CATEGORIA
             WHERE ID_CATEGORIA = :idCategoria
         `, { idCategoria });
 

@@ -26,7 +26,7 @@ router.get('/api/producto', async (req, res, next) => {
                 IVA_MONTO AS "iva_monto",
                 PRECIO_TOTAL AS "precio_total",
                 STOCK_RESERVADO AS "stock_reservado"
-            FROM PRODUCTO
+            FROM ADMIN.PRODUCTO
             WHERE CODIGO_SKU IS NOT NULL 
               AND NOMBRE IS NOT NULL
               AND PRECIO_UNITARIO > 0
@@ -78,7 +78,7 @@ router.get('/api/producto/:id', async (req, res, next) => {
                 IVA_MONTO AS "iva_monto",
                 PRECIO_TOTAL AS "precio_total",
                 STOCK_RESERVADO AS "stock_reservado"
-            FROM PRODUCTO
+            FROM ADMIN.PRODUCTO
             WHERE ID_PRODUCTO = :idProducto
         `, { idProducto });
 

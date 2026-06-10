@@ -21,7 +21,7 @@ router.get('/api/carrito', async (req, res, next) => {
                 TOTAL_CON_IVA AS "total_con_iva",
                 CUOTAS_VISACUOTAS AS "cuotas_visacuotas",
                 ESTADO AS "estado"
-            FROM ORDEN_COMPRA
+            FROM ADMIN.ORDEN_COMPRA
             ORDER BY FECHA_ORDEN DESC
         `);
 
@@ -56,7 +56,7 @@ router.get('/api/carrito/:id', async (req, res, next) => {
                 TOTAL_CON_IVA AS "total_con_iva",
                 CUOTAS_VISACUOTAS AS "cuotas_visacuotas",
                 ESTADO AS "estado"
-            FROM ORDEN_COMPRA
+            FROM ADMIN.ORDEN_COMPRA
             WHERE ID_ORDEN = :idOrden
         `, { idOrden });
 
