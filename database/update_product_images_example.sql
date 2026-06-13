@@ -1,8 +1,3 @@
--- Plantilla para cargar imagenes de productos en el catalogo.
--- Opcion recomendada para este proyecto:
--- 1. Guarda las imagenes en frontend/public/productos/
--- 2. Usa rutas relativas como /productos/nombre-archivo.jpg
--- 3. Ejecuta este script en SQL Developer con tu usuario y permisos.
 
 UPDATE ADMIN.PRODUCTO
 SET URL_GALERIA = '/productos/1-mouse-logitech-g502.jpg'
@@ -53,8 +48,3 @@ SET URL_GALERIA = '/productos/12-lg-ultragear-27.jpg'
 WHERE ID_PRODUCTO = 12;
 
 COMMIT;
-
--- Tambien puedes usar URLs publicas:
--- UPDATE ADMIN.PRODUCTO
--- SET URL_GALERIA = 'https://tu-cdn.com/productos/1-mouse-logitech-g502.jpg'
--- WHERE ID_PRODUCTO = 1;
