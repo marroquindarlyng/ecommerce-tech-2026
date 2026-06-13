@@ -4,6 +4,9 @@ node_modules/
 # Variables de entorno
 .env
 backend/.env
+backend/src/portal-users.json
+backend/uploads/productos/*
+!backend/uploads/productos/.gitkeep
 
 # Build 
 dist/
@@ -16,3 +19,5 @@ npm-debug.log*
 # SO
 .DS_Store
 Thumbs.db
+
+.idea/

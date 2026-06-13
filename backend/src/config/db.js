@@ -77,4 +77,8 @@ function getPool() {
     return oracledb.getPool();
 }
 
-module.exports = { initialize, getPool };
+function getOracleDriver() {
+    return oracledb;
+}
+
+module.exports = { initialize, getPool, getOracleDriver };

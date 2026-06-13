@@ -4,7 +4,7 @@
       <div>
         <span class="eyebrow">Catalogo</span>
         <h1>Articulos disponibles</h1>
-        <p>Inventario conectado directamente con Oracle Cloud.</p>
+        <p>Elige tu siguiente upgrade con stock actualizado y compra rapida.</p>
       </div>
 
       <div class="catalog-summary" aria-label="Resumen del catalogo">
@@ -37,6 +37,34 @@
           </option>
         </select>
       </label>
+
+      <label class="filter-box sort-box">
+        <span>Ordenar</span>
+        <select v-model="ordenSeleccionado">
+          <option value="nombre">Nombre A-Z</option>
+          <option value="precio-asc">Menor precio</option>
+          <option value="precio-desc">Mayor precio</option>
+          <option value="stock-desc">Mayor stock</option>
+        </select>
+      </label>
+    </section>
+
+    <section class="catalog-highlights" aria-label="Beneficios del catalogo">
+      <article>
+        <span>Nuevo</span>
+        <strong>Arma tu setup</strong>
+        <small>Encuentra laptops, monitores, componentes y accesorios en un solo lugar.</small>
+      </article>
+      <article>
+        <span>Stock</span>
+        <strong>{{ stockDisponible }} unidades</strong>
+        <small>Disponibilidad visible antes de agregar al carrito.</small>
+      </article>
+      <article>
+        <span>Compra</span>
+        <strong>Checkout rapido</strong>
+        <small>Guarda tu carrito y completa tu pedido en pocos pasos.</small>
+      </article>
     </section>
 
     <div v-if="cargando" class="state-grid" aria-live="polite">
@@ -60,66 +88,83 @@
     </div>
 
     <div v-else class="product-grid">
-      <RouterLink
+      <article
         v-for="producto in productosFiltrados"
         :key="producto.id_producto"
-        :to="{ name: 'ProductoDetalle', params: { id: producto.id_producto } }"
         class="product-card"
-        :aria-label="`Ver detalle de ${producto.nombre}`"
       >
-        <div class="product-visual">
-          <img
-            v-if="producto.imagen"
-            :src="producto.imagen"
-            :alt="producto.nombre"
-            loading="lazy"
-          >
-          <div v-else class="visual-fallback">
-            <span>{{ iniciales(producto.nombre) }}</span>
-            <small>{{ producto.categoria || 'Tecnologia' }}</small>
-          </div>
-
-          <span class="stock-badge" :class="stockClase(producto.stock)">
-            {{ stockTexto(producto.stock) }}
-          </span>
-        </div>
-
-        <div class="product-info">
-          <div class="product-meta">
-            <span>{{ producto.categoria || 'Sin categoria' }}</span>
-            <code>{{ producto.codigo_sku || 'SKU pendiente' }}</code>
-          </div>
-
-          <h2>{{ producto.nombre }}</h2>
-
-          <p class="description">
-            {{ producto.ficha_tecnica || 'Ficha tecnica pendiente de registrar.' }}
-          </p>
-
-          <div class="product-footer">
-            <div>
-              <span class="price-label">Precio</span>
-              <strong class="price">{{ formatoMoneda(producto.precio) }}</strong>
+        <RouterLink
+          :to="{ name: 'ProductoDetalle', params: { id: producto.id_producto } }"
+          class="product-link"
+          :aria-label="`Ver detalle de ${producto.nombre}`"
+        >
+          <div class="product-visual">
+            <img
+              v-if="producto.imagen"
+              :src="producto.imagen"
+              :alt="producto.nombre"
+              loading="lazy"
+            >
+            <div v-else class="visual-fallback">
+              <span>{{ iniciales(producto.nombre) }}</span>
+              <small>{{ producto.categoria || 'Tecnologia' }}</small>
             </div>
 
-            <span class="detail-action">Ver detalle</span>
+            <span class="stock-badge" :class="stockClase(producto.stock)">
+              {{ stockTexto(producto.stock) }}
+            </span>
           </div>
+
+          <div class="product-info">
+            <div class="product-meta">
+              <span>{{ producto.categoria || 'Sin categoria' }}</span>
+              <code>{{ producto.codigo_sku || 'SKU no disponible' }}</code>
+            </div>
+
+            <h2>{{ producto.nombre }}</h2>
+
+            <p class="description">
+              {{ producto.ficha_tecnica || 'Informacion tecnica en actualizacion.' }}
+            </p>
+          </div>
+        </RouterLink>
+
+        <div class="product-footer">
+          <div>
+            <span class="price-label">Precio</span>
+            <strong class="price">{{ formatoMoneda(producto.precio) }}</strong>
+          </div>
+
+          <button
+            type="button"
+            class="cart-action"
+            :disabled="producto.stock === 0"
+            @click="agregarProducto(producto)"
+          >
+            {{ producto.stock === 0 ? 'Agotado' : 'Agregar' }}
+          </button>
         </div>
-      </RouterLink>
+      </article>
     </div>
   </section>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import api from '../services/api';
+import { resolveAssetUrl } from '../services/assets';
+import { useCart } from '../stores/cart';
 
+const route = useRoute();
 const productos = ref([]);
 const categorias = ref([]);
 const busqueda = ref('');
 const categoriaSeleccionada = ref('');
+const ordenSeleccionado = ref('nombre');
 const cargando = ref(true);
 const error = ref('');
+const { addToCart } = useCart();
 
 const obtenerCampo = (objeto, ...campos) => {
   for (const campo of campos) {
@@ -139,7 +184,7 @@ const normalizarProducto = (producto) => ({
   precio: Number(obtenerCampo(producto, 'precio', 'PRECIO', 'PRECIO_UNITARIO') || 0),
   stock: Number(obtenerCampo(producto, 'stock', 'STOCK', 'STOCK_ACTUAL') || 0),
   ficha_tecnica: obtenerCampo(producto, 'ficha_tecnica', 'FICHA_TECNICA'),
-  imagen: obtenerCampo(producto, 'imagen', 'IMAGEN', 'URL_GALERIA'),
+  imagen: resolveAssetUrl(obtenerCampo(producto, 'imagen', 'IMAGEN', 'URL_GALERIA')),
   categoria: obtenerCampo(producto, 'categoria', 'CATEGORIA')
 });
 
@@ -161,7 +206,7 @@ const cargarCatalogo = async () => {
     productos.value = productosRes.data.map(normalizarProducto);
     categorias.value = categoriasRes.data.map(normalizarCategoria);
   } catch (err) {
-    error.value = 'Verifica que el backend este ejecutandose en http://localhost:3000.';
+    error.value = 'El catalogo no esta disponible en este momento. Intenta nuevamente en unos segundos.';
     console.error(err);
   } finally {
     cargando.value = false;
@@ -171,7 +216,7 @@ const cargarCatalogo = async () => {
 const productosFiltrados = computed(() => {
   const texto = busqueda.value.toLowerCase();
 
-  return productos.value.filter((producto) => {
+  const filtrados = productos.value.filter((producto) => {
     const coincideCategoria = !categoriaSeleccionada.value || producto.categoria === categoriaSeleccionada.value;
     const contenido = [
       producto.nombre,
@@ -181,7 +226,16 @@ const productosFiltrados = computed(() => {
 
     return coincideCategoria && (!texto || contenido.includes(texto));
   });
+
+  return [...filtrados].sort((a, b) => {
+    if (ordenSeleccionado.value === 'precio-asc') return a.precio - b.precio;
+    if (ordenSeleccionado.value === 'precio-desc') return b.precio - a.precio;
+    if (ordenSeleccionado.value === 'stock-desc') return b.stock - a.stock;
+    return a.nombre.localeCompare(b.nombre);
+  });
 });
+
+const stockDisponible = computed(() => productos.value.reduce((total, producto) => total + producto.stock, 0));
 
 const formatoMoneda = (valor) => new Intl.NumberFormat('es-GT', {
   style: 'currency',
@@ -209,7 +263,20 @@ const stockClase = (stock) => {
   return 'ok';
 };
 
-onMounted(cargarCatalogo);
+const agregarProducto = (producto) => {
+  addToCart(producto, 1);
+};
+
+const sincronizarQuery = () => {
+  busqueda.value = typeof route.query.buscar === 'string' ? route.query.buscar : '';
+  categoriaSeleccionada.value = typeof route.query.categoria === 'string' ? route.query.categoria : '';
+};
+
+onMounted(() => {
+  sincronizarQuery();
+  cargarCatalogo();
+});
+watch(() => route.query, sincronizarQuery);
 </script>
 
 <style scoped>
@@ -273,7 +340,7 @@ onMounted(cargarCatalogo);
 
 .toolbar {
   display: grid;
-  grid-template-columns: minmax(240px, 1fr) minmax(200px, 280px);
+  grid-template-columns: minmax(240px, 1fr) minmax(180px, 240px) minmax(160px, 220px);
   gap: 14px;
   align-items: end;
 }
@@ -315,10 +382,47 @@ select:focus {
   box-shadow: 0 0 0 3px rgba(31, 105, 161, 0.14);
 }
 
+.catalog-highlights {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 14px;
+}
+
+.catalog-highlights article {
+  display: grid;
+  gap: 7px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(31, 105, 161, 0.08), rgba(182, 93, 19, 0.05)),
+    white;
+  padding: 18px;
+  box-shadow: var(--shadow-soft);
+}
+
+.catalog-highlights span {
+  color: var(--accent);
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.catalog-highlights strong {
+  color: var(--ink);
+  font-size: 1.1rem;
+}
+
+.catalog-highlights small {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
 .product-grid,
 .state-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  align-items: stretch;
   gap: 18px;
 }
 
@@ -334,7 +438,7 @@ select:focus {
 .product-card {
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  min-height: 520px;
   color: inherit;
   text-decoration: none;
   transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
@@ -346,18 +450,33 @@ select:focus {
   box-shadow: 0 18px 36px rgba(24, 39, 75, 0.1);
 }
 
+.product-link {
+  display: grid;
+  grid-template-rows: 230px 1fr;
+  flex: 1;
+  color: inherit;
+  text-decoration: none;
+}
+
 .product-visual {
   position: relative;
   display: grid;
   place-items: center;
-  aspect-ratio: 4 / 3;
-  background: linear-gradient(145deg, #edf3f8, #f9fbfc);
+  height: 230px;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.9), transparent 32%),
+    linear-gradient(145deg, #edf3f8, #f9fbfc);
+  padding: 18px;
 }
 
 .product-visual img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: auto;
+  height: auto;
+  max-width: min(86%, 190px);
+  max-height: 152px;
+  object-fit: contain;
+  object-position: center;
+  filter: drop-shadow(0 10px 18px rgba(24, 39, 75, 0.12));
 }
 
 .visual-fallback {
@@ -417,11 +536,11 @@ select:focus {
 }
 
 .product-info {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto minmax(2.9em, auto) minmax(4.5em, auto);
   gap: 14px;
   padding: 18px;
+  background: linear-gradient(180deg, #fff, #fbfdff);
 }
 
 .product-meta {
@@ -435,6 +554,13 @@ select:focus {
   text-transform: uppercase;
 }
 
+.product-meta span {
+  overflow: hidden;
+  max-width: 50%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .product-meta code {
   overflow: hidden;
   max-width: 48%;
@@ -445,16 +571,20 @@ select:focus {
 }
 
 .product-info h2 {
+  display: -webkit-box;
   min-height: 2.9em;
   margin: 0;
+  overflow: hidden;
   color: var(--ink);
   font-size: 1.08rem;
   line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .description {
   display: -webkit-box;
-  min-height: 3.6em;
+  min-height: 4.5em;
   margin: 0;
   overflow: hidden;
   color: var(--muted);
@@ -470,7 +600,7 @@ select:focus {
   align-items: center;
   gap: 12px;
   margin-top: auto;
-  padding-top: 4px;
+  padding: 0 18px 18px;
 }
 
 .price-label {
@@ -485,7 +615,7 @@ select:focus {
   font-size: 1.24rem;
 }
 
-.detail-action,
+.cart-action,
 button {
   display: inline-flex;
   justify-content: center;
@@ -502,7 +632,7 @@ button {
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
-.product-card:hover .detail-action,
+.product-card:hover .cart-action,
 button:hover:not(:disabled) {
   background: var(--accent);
   transform: translateY(-1px);
@@ -594,9 +724,17 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 
+  .catalog-highlights {
+    grid-template-columns: 1fr;
+  }
+
   .product-grid,
   .state-grid {
     grid-template-columns: 1fr;
+  }
+
+  .product-card {
+    min-height: auto;
   }
 
   .product-info h2,

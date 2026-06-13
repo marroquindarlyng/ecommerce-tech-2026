@@ -11,6 +11,27 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+// ---- REGISTRO DE RUTAS CON REGLAS CRÍTICAS ----
+const productoRouter = require('./producto');
+const carritoRouter = require('./carrito');
+const carritoDetalleRouter = require('./carrito-detalle');
+const clienteRouter = require('./cliente');
+const categoriaRouter = require('./categoria');
+const portalAuthRouter = require('./portal-auth');
+const uploadsRouter = require('./uploads');
+
+app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
+
+app.use(categoriaRouter);       // Endpoints GET /api/categoria y GET /api/categoria/:id
+
+app.use(clienteRouter);         // Endpoints GET /api/cliente y GET /api/cliente/:id
+
+app.use(productoRouter);        // Endpoints POST /api/producto
+app.use(carritoRouter);         // Endpoints POST /api/carrito/crear
+app.use(carritoDetalleRouter);  // Endpoints POST /api/carrito-detalle/agregar
+app.use(portalAuthRouter);      // Endpoints de cuenta cliente y panel admin
+app.use(uploadsRouter);         // Endpoints de carga de imagenes
+
 // Ruta de diagnóstico
 app.get('/api/health', (req, res) => {
     res.status(200).json({
@@ -29,7 +50,7 @@ app.get('/api/categorias', async (req, res, next) => {
             SELECT
                 id_categoria AS "id_categoria",
                 nombre AS "nombre"
-            FROM categoria
+            FROM ADMIN.CATEGORIA
             ORDER BY nombre
         `);
 
@@ -58,9 +79,12 @@ app.get('/api/productos', async (req, res, next) => {
                 p.stock_actual AS "stock",
                 p.ficha_tecnica AS "ficha_tecnica",
                 p.url_galeria AS "imagen",
+                p.iva_monto AS "iva_monto",
+                p.precio_total AS "precio_total",
+                p.stock_reservado AS "stock_reservado",
                 c.nombre AS "categoria"
-            FROM producto p
-            LEFT JOIN categoria c ON c.id_categoria = p.id_categoria
+            FROM ADMIN.PRODUCTO p
+            LEFT JOIN ADMIN.CATEGORIA c ON c.id_categoria = p.id_categoria
             ORDER BY p.nombre
         `);
 
@@ -97,9 +121,12 @@ app.get('/api/productos/:id', async (req, res, next) => {
                 p.stock_actual AS "stock",
                 p.ficha_tecnica AS "ficha_tecnica",
                 p.url_galeria AS "imagen",
+                p.iva_monto AS "iva_monto",
+                p.precio_total AS "precio_total",
+                p.stock_reservado AS "stock_reservado",
                 c.nombre AS "categoria"
-            FROM producto p
-            LEFT JOIN categoria c ON c.id_categoria = p.id_categoria
+            FROM ADMIN.PRODUCTO p
+            LEFT JOIN ADMIN.CATEGORIA c ON c.id_categoria = p.id_categoria
             WHERE p.id_producto = :idProducto
         `, { idProducto });
 
