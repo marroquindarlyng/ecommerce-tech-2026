@@ -15,11 +15,11 @@ router.get('/api/cliente', async (req, res, next) => {
             SELECT 
                 ID_CLIENTE AS "id_cliente",
                 NIT AS "nit",
-                NOMBRE_COMPRETO AS "nombre_completo",
+                NOMBRE_COMPLETO AS "nombre_completo",
                 CORREO AS "correo",
                 DIRECCION_ENVIO AS "direccion_envio"
             FROM ADMIN.CLIENTE
-            ORDER BY NOMBRE_COMPRETO ASC
+            ORDER BY NOMBRE_COMPLETO ASC
         `);
 
         res.json(result.rows);
@@ -47,7 +47,7 @@ router.get('/api/cliente/:id', async (req, res, next) => {
             SELECT 
                 ID_CLIENTE AS "id_cliente",
                 NIT AS "nit",
-                NOMBRE_COMPRETO AS "nombre_completo",
+                NOMBRE_COMPLETO AS "nombre_completo",
                 CORREO AS "correo",
                 DIRECCION_ENVIO AS "direccion_envio"
             FROM ADMIN.CLIENTE
@@ -95,7 +95,7 @@ router.post('/api/cliente', async (req, res, next) => {
         const sql = `
             INSERT INTO CLIENTE (
                 NIT,
-                NOMBRE_COMPRETO,
+                NOMBRE_COMPLETO,
                 CORREO,
                 DIRECCION_ENVIO
             ) VALUES (
@@ -159,7 +159,7 @@ router.put('/api/cliente/:id', async (req, res, next) => {
             UPDATE CLIENTE
             SET 
                 NIT = :nit,
-                NOMBRE_COMPRETO = :nombre_completo,
+                NOMBRE_COMPLETO = :nombre_completo,
                 CORREO = :correo,
                 DIRECCION_ENVIO = :direccion_envio
             WHERE ID_CLIENTE = :idCliente

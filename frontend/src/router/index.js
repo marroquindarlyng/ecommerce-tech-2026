@@ -6,13 +6,23 @@ import CatalogoView from '../views/CatalogoView.vue';
 import ProductoDetalleView from '../views/ProductoDetalleView.vue';
 import CotizadorView from '../views/CotizadorView.vue';
 import CarritoView from '../views/CarritoView.vue';
+import PagoView from '../views/PagoView.vue';
+import LoginView from '../views/LoginView.vue';
+import MiCuentaView from '../views/MiCuentaView.vue';
+import AdminView from '../views/AdminView.vue';
+import VendedorView from '../views/VendedorView.vue';
 
 const routes = [
   { path: '/', name: 'Inicio', component: HomeView },
   { path: '/catalogo', name: 'Catalogo', component: CatalogoView },
   { path: '/catalogo/:id', name: 'ProductoDetalle', component: ProductoDetalleView, props: true },
   { path: '/cotizador', name: 'Cotizador', component: CotizadorView },
-  { path: '/carrito', name: 'Carrito', component: CarritoView }
+  { path: '/carrito', name: 'Carrito', component: CarritoView },
+  { path: '/pago', name: 'Pago', component: PagoView },
+  { path: '/login', name: 'Login', component: LoginView },
+  { path: '/mi-cuenta', name: 'MiCuenta', component: MiCuentaView },
+  { path: '/admin', name: 'Admin', component: AdminView },
+  { path: '/vendedor', name: 'Vendedor', component: VendedorView }
 ];
 
 const router = createRouter({

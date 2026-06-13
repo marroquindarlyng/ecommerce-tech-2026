@@ -1,12 +1,10 @@
 import axios from 'axios';
 
-// Creamos una instancia preconfigurada
+export const apiBaseURL = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace(/\/$/, '');
+
 const api = axios.create({
-    baseURL: '/api', // URL base de tu Node.js
-    timeout: 5000, // Si el backend no responde en 5 segundos, aborta
-    headers: {
-        'Content-Type': 'application/json'
-    }
+    baseURL: apiBaseURL,
+    timeout: 5000
 });
 
 // Aquí a futuro se pueden agregar "Interceptors" para inyectar el Token JWT en cada petición

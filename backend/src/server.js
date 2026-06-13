@@ -17,6 +17,10 @@ const carritoRouter = require('./carrito');
 const carritoDetalleRouter = require('./carrito-detalle');
 const clienteRouter = require('./cliente');
 const categoriaRouter = require('./categoria');
+const portalAuthRouter = require('./portal-auth');
+const uploadsRouter = require('./uploads');
+
+app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
 
 app.use(categoriaRouter);       // Endpoints GET /api/categoria y GET /api/categoria/:id
 
@@ -25,6 +29,8 @@ app.use(clienteRouter);         // Endpoints GET /api/cliente y GET /api/cliente
 app.use(productoRouter);        // Endpoints POST /api/producto
 app.use(carritoRouter);         // Endpoints POST /api/carrito/crear
 app.use(carritoDetalleRouter);  // Endpoints POST /api/carrito-detalle/agregar
+app.use(portalAuthRouter);      // Endpoints de cuenta cliente y panel admin
+app.use(uploadsRouter);         // Endpoints de carga de imagenes
 
 // Ruta de diagnóstico
 app.get('/api/health', (req, res) => {
@@ -73,6 +79,9 @@ app.get('/api/productos', async (req, res, next) => {
                 p.stock_actual AS "stock",
                 p.ficha_tecnica AS "ficha_tecnica",
                 p.url_galeria AS "imagen",
+                p.iva_monto AS "iva_monto",
+                p.precio_total AS "precio_total",
+                p.stock_reservado AS "stock_reservado",
                 c.nombre AS "categoria"
             FROM ADMIN.PRODUCTO p
             LEFT JOIN ADMIN.CATEGORIA c ON c.id_categoria = p.id_categoria
@@ -112,6 +121,9 @@ app.get('/api/productos/:id', async (req, res, next) => {
                 p.stock_actual AS "stock",
                 p.ficha_tecnica AS "ficha_tecnica",
                 p.url_galeria AS "imagen",
+                p.iva_monto AS "iva_monto",
+                p.precio_total AS "precio_total",
+                p.stock_reservado AS "stock_reservado",
                 c.nombre AS "categoria"
             FROM ADMIN.PRODUCTO p
             LEFT JOIN ADMIN.CATEGORIA c ON c.id_categoria = p.id_categoria

@@ -25,7 +25,7 @@ router.get('/api/carrito-detalle/orden/:id_orden', async (req, res, next) => {
                 p.NOMBRE AS "nombre_producto",
                 d.CANTIDAD AS "cantidad",
                 d.PRECIO_UNITARIO AS "precio_unitario",
-                d.SUBTOTAL AS "subtotal"
+                d.SUBTOTAL_LINEA AS "subtotal_linea"
             FROM ADMIN.DETALLE_ORDEN d
             LEFT JOIN ADMIN.PRODUCTO p ON d.ID_PRODUCTO = p.ID_PRODUCTO
             WHERE d.ID_ORDEN = :idOrden
@@ -85,8 +85,8 @@ router.post('/api/carrito-detalle/agregar', async (req, res, next) => {
                 throw new Error(`El artículo con ID ${id_producto} no figura en el catálogo de Oracle.`);
             }
 
-            const stockActual = stockResult.rows[0][0] || 0;
-            const nombreProducto = stockResult.rows[0][1];
+            const stockActual = stockResult.rows[0].STOCK_ACTUAL || 0;
+            const nombreProducto = stockResult.rows[0].NOMBRE;
 
             // --- REGLA 5: PROHIBIR PRODUCTOS CON EXISTENCIAS EN CERO ---
             if (stockActual === 0) {
@@ -116,7 +116,7 @@ router.post('/api/carrito-detalle/agregar', async (req, res, next) => {
                     ID_PRODUCTO,
                     CANTIDAD,
                     PRECIO_UNITARIO,
-                    SUBTOTAL
+                    SUBTOTAL_LINEA
                 ) VALUES (
                     :id_orden,
                     :id_producto,

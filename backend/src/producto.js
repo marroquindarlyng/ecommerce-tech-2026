@@ -16,21 +16,23 @@ router.get('/api/producto', async (req, res, next) => {
         const result = await connection.execute(`
             SELECT 
                 ID_PRODUCTO AS "id_producto",
-                ID_CATEGORIA AS "id_categoria",
-                CODIGO_SKU AS "codigo_sku",
-                NOMBRE AS "nombre",
-                PRECIO_UNITARIO AS "precio_unitario",
-                STOCK_ACTUAL AS "stock_actual",
-                FICHA_TECNICA AS "ficha_tecnica",
-                URL_GALERIA AS "url_galeria",
-                IVA_MONTO AS "iva_monto",
-                PRECIO_TOTAL AS "precio_total",
-                STOCK_RESERVADO AS "stock_reservado"
-            FROM ADMIN.PRODUCTO
-            WHERE CODIGO_SKU IS NOT NULL 
-              AND NOMBRE IS NOT NULL
-              AND PRECIO_UNITARIO > 0
-            ORDER BY NOMBRE ASC
+                p.ID_CATEGORIA AS "id_categoria",
+                p.CODIGO_SKU AS "codigo_sku",
+                p.NOMBRE AS "nombre",
+                p.PRECIO_UNITARIO AS "precio_unitario",
+                p.STOCK_ACTUAL AS "stock_actual",
+                p.FICHA_TECNICA AS "ficha_tecnica",
+                p.URL_GALERIA AS "url_galeria",
+                p.IVA_MONTO AS "iva_monto",
+                p.PRECIO_TOTAL AS "precio_total",
+                p.STOCK_RESERVADO AS "stock_reservado",
+                c.NOMBRE AS "categoria"
+            FROM ADMIN.PRODUCTO p
+            LEFT JOIN ADMIN.CATEGORIA c ON c.ID_CATEGORIA = p.ID_CATEGORIA
+            WHERE p.CODIGO_SKU IS NOT NULL 
+              AND p.NOMBRE IS NOT NULL
+              AND p.PRECIO_UNITARIO > 0
+            ORDER BY p.NOMBRE ASC
         `);
 
         // REGLA 14: Los montos van formateados con la semántica de Quetzales (Q)
@@ -68,18 +70,20 @@ router.get('/api/producto/:id', async (req, res, next) => {
         const result = await connection.execute(`
             SELECT 
                 ID_PRODUCTO AS "id_producto",
-                ID_CATEGORIA AS "id_categoria",
-                CODIGO_SKU AS "codigo_sku",
-                NOMBRE AS "nombre",
-                PRECIO_UNITARIO AS "precio_unitario",
-                STOCK_ACTUAL AS "stock_actual",
-                FICHA_TECNICA AS "ficha_tecnica",
-                URL_GALERIA AS "url_galeria",
-                IVA_MONTO AS "iva_monto",
-                PRECIO_TOTAL AS "precio_total",
-                STOCK_RESERVADO AS "stock_reservado"
-            FROM ADMIN.PRODUCTO
-            WHERE ID_PRODUCTO = :idProducto
+                p.ID_CATEGORIA AS "id_categoria",
+                p.CODIGO_SKU AS "codigo_sku",
+                p.NOMBRE AS "nombre",
+                p.PRECIO_UNITARIO AS "precio_unitario",
+                p.STOCK_ACTUAL AS "stock_actual",
+                p.FICHA_TECNICA AS "ficha_tecnica",
+                p.URL_GALERIA AS "url_galeria",
+                p.IVA_MONTO AS "iva_monto",
+                p.PRECIO_TOTAL AS "precio_total",
+                p.STOCK_RESERVADO AS "stock_reservado",
+                c.NOMBRE AS "categoria"
+            FROM ADMIN.PRODUCTO p
+            LEFT JOIN ADMIN.CATEGORIA c ON c.ID_CATEGORIA = p.ID_CATEGORIA
+            WHERE p.ID_PRODUCTO = :idProducto
         `, { idProducto });
 
         if (result.rows.length === 0) {

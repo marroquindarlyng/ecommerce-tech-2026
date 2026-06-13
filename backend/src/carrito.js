@@ -153,6 +153,138 @@ router.post('/api/carrito/crear', async (req, res, next) => {
 // ========================================================
 // 4. PUT /api/carrito/:id -> ACTUALIZACIÓN DE ESTADO (AUDITORÍA)
 // ========================================================
+router.post('/api/carrito/confirmar', async (req, res, next) => {
+    let connection;
+    const { id_cliente, subtotal, monto_iva, total_con_iva, cuotas_visacuotas, productos } = req.body;
+
+    if (!id_cliente || typeof id_cliente !== 'number') {
+        return res.status(400).json({ estado: 'ERROR', mensaje: 'Regla 16: No se puede generar una orden sin asociar un cliente valido.' });
+    }
+
+    if (!productos || !Array.isArray(productos) || productos.length === 0) {
+        return res.status(400).json({ estado: 'ERROR', mensaje: 'Regla 16: No se puede generar una orden vacia sin articulos.' });
+    }
+
+    if (subtotal === undefined || subtotal <= 0 || total_con_iva === undefined || total_con_iva <= 0) {
+        return res.status(400).json({ estado: 'ERROR', mensaje: 'Regla 16: El subtotal y total de la orden deben ser superiores a Q0.00.' });
+    }
+
+    const ivaCalculado = Number((subtotal * 0.12).toFixed(2));
+    const totalCalculado = Number((subtotal + ivaCalculado).toFixed(2));
+
+    if (Math.abs(monto_iva - ivaCalculado) > 0.02 || Math.abs(total_con_iva - totalCalculado) > 0.02) {
+        return res.status(400).json({
+            estado: 'ERROR',
+            mensaje: `Regla 1: Inconsistencia fiscal detectada. Para un subtotal de Q${subtotal}, el IVA debe ser Q${ivaCalculado} y el Total Q${totalCalculado}.`
+        });
+    }
+
+    try {
+        connection = await database.getPool().getConnection();
+
+        const orderResult = await connection.execute(`
+            INSERT INTO ADMIN.ORDEN_COMPRA (
+                ID_CLIENTE,
+                SUBTOTAL,
+                MONTO_IVA,
+                TOTAL_CON_IVA,
+                CUOTAS_VISACUOTAS
+            ) VALUES (
+                :id_cliente,
+                :subtotal,
+                :monto_iva,
+                :total_con_iva,
+                :cuotas_visacuotas
+            ) RETURNING ID_ORDEN, ESTADO, FECHA_ORDEN INTO :out_id, :out_estado, :out_fecha
+        `, {
+            id_cliente,
+            subtotal,
+            monto_iva,
+            total_con_iva,
+            cuotas_visacuotas: cuotas_visacuotas || 1,
+            out_id: { type: database.getOracleDriver().NUMBER, dir: database.getOracleDriver().BIND_OUT },
+            out_estado: { type: database.getOracleDriver().STRING, dir: database.getOracleDriver().BIND_OUT, maxSize: 20 },
+            out_fecha: { type: database.getOracleDriver().TIMESTAMP, dir: database.getOracleDriver().BIND_OUT }
+        });
+
+        const idOrden = orderResult.outBinds.out_id[0];
+
+        for (const item of productos) {
+            const { id_producto, cantidad, precio_unitario } = item;
+
+            if (!id_producto || !cantidad || cantidad <= 0 || !precio_unitario || precio_unitario <= 0) {
+                throw new Error('Estructura de item inconsistente. Verifique ID, cantidad y precios.');
+            }
+
+            const stockResult = await connection.execute(`
+                SELECT STOCK_ACTUAL AS "stock_actual", NOMBRE AS "nombre"
+                FROM ADMIN.PRODUCTO
+                WHERE ID_PRODUCTO = :id_producto
+                FOR UPDATE
+            `, { id_producto });
+
+            if (stockResult.rows.length === 0) {
+                throw new Error(`El articulo con ID ${id_producto} no figura en el catalogo de Oracle.`);
+            }
+
+            const stockActual = stockResult.rows[0].stock_actual || 0;
+            const nombreProducto = stockResult.rows[0].nombre;
+
+            if (stockActual === 0) {
+                throw new Error(`Regla 5: El producto "${nombreProducto}" se encuentra AGOTADO.`);
+            }
+
+            if (cantidad > stockActual) {
+                throw new Error(`Regla 5: Stock insuficiente para "${nombreProducto}". Solicitado: ${cantidad}, Disponible: ${stockActual}.`);
+            }
+
+            const subtotalLinea = Number((cantidad * precio_unitario).toFixed(2));
+
+            await connection.execute(`
+                INSERT INTO ADMIN.DETALLE_ORDEN (
+                    ID_ORDEN,
+                    ID_PRODUCTO,
+                    CANTIDAD,
+                    PRECIO_UNITARIO,
+                    SUBTOTAL_LINEA
+                ) VALUES (
+                    :idOrden,
+                    :id_producto,
+                    :cantidad,
+                    :precio_unitario,
+                    :subtotalLinea
+                )
+            `, { idOrden, id_producto, cantidad, precio_unitario, subtotalLinea });
+
+            await connection.execute(`
+                UPDATE ADMIN.PRODUCTO
+                SET STOCK_ACTUAL = STOCK_ACTUAL - :cantidad
+                WHERE ID_PRODUCTO = :id_producto
+            `, { cantidad, id_producto });
+        }
+
+        await connection.commit();
+
+        res.status(201).json({
+            estado: 'OK',
+            mensaje: 'Orden creada exitosamente con detalle e inventario actualizado.',
+            data: {
+                id_orden: idOrden,
+                estado: orderResult.outBinds.out_estado[0],
+                fecha_orden: orderResult.outBinds.out_fecha[0]
+            }
+        });
+    } catch (err) {
+        if (connection) {
+            console.error('[Rollback Carrito] Revirtiendo orden por error:', err.message);
+            await connection.rollback();
+        }
+        next(err);
+    } finally {
+        if (connection) await connection.close();
+    }
+});
+
 router.put('/api/carrito/:id', async (req, res, next) => {
     let connection;
     const idOrden = Number(req.params.id);

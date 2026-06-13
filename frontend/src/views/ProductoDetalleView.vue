@@ -34,7 +34,7 @@
         <div class="product-heading">
           <span class="category">{{ producto.categoria || 'Sin categoria' }}</span>
           <h1>{{ producto.nombre }}</h1>
-          <code>{{ producto.codigo_sku || 'SKU pendiente' }}</code>
+          <code>{{ producto.codigo_sku || 'SKU no disponible' }}</code>
         </div>
 
         <div class="purchase-panel">
@@ -50,9 +50,34 @@
           </div>
         </div>
 
+        <section class="cart-panel">
+          <div class="qty-control">
+            <button type="button" :disabled="cantidad <= 1" @click="cantidad -= 1">-</button>
+            <input
+              v-model.number="cantidad"
+              type="number"
+              min="1"
+              :max="producto.stock"
+              @change="normalizarCantidad"
+            >
+            <button type="button" :disabled="cantidad >= producto.stock" @click="cantidad += 1">+</button>
+          </div>
+
+          <button
+            type="button"
+            class="add-button"
+            :disabled="producto.stock === 0"
+            @click="agregarAlCarrito"
+          >
+            {{ producto.stock === 0 ? 'Producto agotado' : 'Agregar al carrito' }}
+          </button>
+        </section>
+
+        <p v-if="mensaje" class="cart-message">{{ mensaje }}</p>
+
         <section class="spec-section">
           <h2>Ficha tecnica</h2>
-          <p>{{ producto.ficha_tecnica || 'Este producto aun no tiene ficha tecnica registrada.' }}</p>
+          <p>{{ producto.ficha_tecnica || 'La informacion tecnica de este producto se esta actualizando.' }}</p>
         </section>
 
         <dl class="data-grid">
@@ -78,11 +103,16 @@
 import { onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import api from '../services/api';
+import { resolveAssetUrl } from '../services/assets';
+import { useCart } from '../stores/cart';
 
 const route = useRoute();
 const producto = ref(null);
 const cargando = ref(true);
 const error = ref('');
+const cantidad = ref(1);
+const mensaje = ref('');
+const { addToCart } = useCart();
 
 const obtenerCampo = (objeto, ...campos) => {
   for (const campo of campos) {
@@ -102,7 +132,7 @@ const normalizarProducto = (item) => ({
   precio: Number(obtenerCampo(item, 'precio', 'PRECIO', 'PRECIO_UNITARIO') || 0),
   stock: Number(obtenerCampo(item, 'stock', 'STOCK', 'STOCK_ACTUAL') || 0),
   ficha_tecnica: obtenerCampo(item, 'ficha_tecnica', 'FICHA_TECNICA'),
-  imagen: obtenerCampo(item, 'imagen', 'IMAGEN', 'URL_GALERIA'),
+  imagen: resolveAssetUrl(obtenerCampo(item, 'imagen', 'IMAGEN', 'URL_GALERIA')),
   categoria: obtenerCampo(item, 'categoria', 'CATEGORIA')
 });
 
@@ -113,10 +143,12 @@ const cargarProducto = async () => {
   try {
     const res = await api.get(`/productos/${route.params.id}`);
     producto.value = normalizarProducto(res.data);
+    cantidad.value = producto.value.stock > 0 ? 1 : 0;
+    mensaje.value = '';
   } catch (err) {
     error.value = err.response?.status === 404
       ? 'El producto solicitado no existe.'
-      : 'Verifica que el backend este ejecutandose en http://localhost:3000.';
+      : 'El detalle del producto no esta disponible en este momento.';
     console.error(err);
   } finally {
     cargando.value = false;
@@ -147,6 +179,18 @@ const stockClase = (stock) => {
   if (stock === 0) return 'out';
   if (stock <= 5) return 'low';
   return 'ok';
+};
+
+const normalizarCantidad = () => {
+  if (!producto.value) return;
+  cantidad.value = Math.min(Math.max(Number(cantidad.value || 1), 1), producto.value.stock);
+};
+
+const agregarAlCarrito = () => {
+  if (!producto.value) return;
+  normalizarCantidad();
+  const result = addToCart(producto.value, cantidad.value);
+  mensaje.value = result.message;
 };
 
 onMounted(cargarProducto);
@@ -188,14 +232,22 @@ watch(() => route.params.id, cargarProducto);
 }
 
 .media-panel {
+  display: grid;
+  place-items: center;
   overflow: hidden;
   min-height: 420px;
+  padding: clamp(18px, 4vw, 36px);
+  background: linear-gradient(145deg, #edf3f8, #f9fbfc);
 }
 
 .media-panel img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: auto;
+  height: auto;
+  max-width: 92%;
+  max-height: 520px;
+  object-fit: contain;
+  object-position: center;
+  filter: drop-shadow(0 18px 28px rgba(24, 39, 75, 0.14));
 }
 
 .visual-fallback {
@@ -330,6 +382,63 @@ code {
   gap: 10px;
 }
 
+.cart-panel {
+  display: grid;
+  grid-template-columns: 132px 1fr;
+  gap: 12px;
+}
+
+.qty-control {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  gap: 6px;
+}
+
+.qty-control button,
+.add-button {
+  border: 0;
+  border-radius: 6px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.qty-control button {
+  background: #eef3f7;
+  color: var(--ink);
+}
+
+.qty-control button:disabled,
+.add-button:disabled {
+  color: #9aa5af;
+  cursor: not-allowed;
+}
+
+.qty-control input {
+  width: 100%;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  text-align: center;
+  font: inherit;
+  font-weight: 800;
+}
+
+.add-button {
+  min-height: 42px;
+  background: var(--ink);
+  color: white;
+}
+
+.add-button:hover:not(:disabled) {
+  background: var(--accent);
+}
+
+.cart-message {
+  color: var(--accent-strong);
+  font-weight: 800;
+}
+
 .spec-section h2 {
   color: var(--ink);
   font-size: 1.2rem;
@@ -433,6 +542,7 @@ button {
 @media (max-width: 860px) {
   .detail-shell,
   .purchase-panel,
+  .cart-panel,
   .data-grid {
     grid-template-columns: 1fr;
   }

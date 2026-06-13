@@ -1,0 +1,60 @@
+-- Plantilla para cargar imagenes de productos en el catalogo.
+-- Opcion recomendada para este proyecto:
+-- 1. Guarda las imagenes en frontend/public/productos/
+-- 2. Usa rutas relativas como /productos/nombre-archivo.jpg
+-- 3. Ejecuta este script en SQL Developer con tu usuario y permisos.
+
+UPDATE ADMIN.PRODUCTO
+SET URL_GALERIA = '/productos/1-mouse-logitech-g502.jpg'
+WHERE ID_PRODUCTO = 1;
+
+UPDATE ADMIN.PRODUCTO
+SET URL_GALERIA = '/productos/2-dell-xps-13-plus.jpg'
+WHERE ID_PRODUCTO = 2;
+
+UPDATE ADMIN.PRODUCTO
+SET URL_GALERIA = '/productos/3-hp-spectre-x360.jpg'
+WHERE ID_PRODUCTO = 3;
+
+UPDATE ADMIN.PRODUCTO
+SET URL_GALERIA = '/productos/4-asus-zephyrus-g14.jpg'
+WHERE ID_PRODUCTO = 4;
+
+UPDATE ADMIN.PRODUCTO
+SET URL_GALERIA = '/productos/5-lenovo-legion-5-pro.jpg'
+WHERE ID_PRODUCTO = 5;
+
+UPDATE ADMIN.PRODUCTO
+SET URL_GALERIA = '/productos/6-macbook-pro-14-m2.jpg'
+WHERE ID_PRODUCTO = 6;
+
+UPDATE ADMIN.PRODUCTO
+SET URL_GALERIA = '/productos/7-amd-ryzen-5-5600x.jpg'
+WHERE ID_PRODUCTO = 7;
+
+UPDATE ADMIN.PRODUCTO
+SET URL_GALERIA = '/productos/8-intel-core-i9-12900k.jpg'
+WHERE ID_PRODUCTO = 8;
+
+UPDATE ADMIN.PRODUCTO
+SET URL_GALERIA = '/productos/9-asus-rog-strix-b550-f.jpg'
+WHERE ID_PRODUCTO = 9;
+
+UPDATE ADMIN.PRODUCTO
+SET URL_GALERIA = '/productos/10-corsair-vengeance-16gb-ddr4.jpg'
+WHERE ID_PRODUCTO = 10;
+
+UPDATE ADMIN.PRODUCTO
+SET URL_GALERIA = '/productos/11-samsung-980-pro-1tb.jpg'
+WHERE ID_PRODUCTO = 11;
+
+UPDATE ADMIN.PRODUCTO
+SET URL_GALERIA = '/productos/12-lg-ultragear-27.jpg'
+WHERE ID_PRODUCTO = 12;
+
+COMMIT;
+
+-- Tambien puedes usar URLs publicas:
+-- UPDATE ADMIN.PRODUCTO
+-- SET URL_GALERIA = 'https://tu-cdn.com/productos/1-mouse-logitech-g502.jpg'
+-- WHERE ID_PRODUCTO = 1;
